@@ -113,7 +113,7 @@ class StoreController < ApplicationController
   # Serve quick_donate page; POST calls #process_donation
   def donate
     reset_shopping                 # even if order in progress, going to donation page cancels it
-    @account_code = AccountCode.find_by(code: params[:fund_code]) || AccountCode.default_account_code
+    @account_code = AccountCode.find_by(code: params[:account_code]) || AccountCode.default_account_code
     @account_code_name = @account_code.name
     @account_code_description = @account_code.description
     if @customer == Customer.anonymous_customer
@@ -124,18 +124,16 @@ class StoreController < ApplicationController
   end
 
   def process_donation
-    # byebug
     @amount = to_numeric(params[:donation])
-    @account_code = AccountCode.find(params[:account_code_id])
-
+    @account_code = AccountCode.find(params[:fund_code])
     if params[:customer_id].blank?
       customer_params = params.require(:customer).permit(Customer.user_modifiable_attributes)
       @customer = Customer.for_donation(customer_params)
-      # byebug
-      @customer.errors.empty? or return redirect_to(quick_donate_path(:customer => params[:customer], :donation => @amount), :alert => "Incomplete or invalid donor information: #{@customer.errors.as_html}")
+      @customer.errors.empty? or return redirect_to(quick_donate_path(:customer => params[:customer], :account_code => @account_code.code, :donation => @amount), :alert => "Incomplete or invalid donor information: #{@customer.errors.as_html}")
     else     # we got here via a logged-in customer
       @customer = Customer.find params[:customer_id]
     end
+    puts "Name: #{@customer.name}"
     # At this point, the customer has been persisted, so future redirects just use the customer id.
     redirect_route = quick_donate_path(:customer_id => @customer.id, :donation => @amount)
     @amount > 0 or return redirect_to(redirect_route, :alert => 'Donation amount must be provided')
