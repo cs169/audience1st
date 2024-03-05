@@ -34,3 +34,18 @@
  Then /^the setting "(.*)" should be "(.*)"$/ do |opt,val|
    expect(Option.send(opt.tr(' ','').underscore)).to eq(val)
  end
+
+ When("I set {string} to {string}") do |setting_name, value|
+  if value == 'Yes'
+    value = true
+  elsif value == 'No'
+    value = false
+  end
+  option = Option.find(1)
+  option.update_attribute(setting_name.parameterize.underscore.to_sym, value)
+ end
+
+ Then("the radio button to select the default donation type should be {string}") do |value|
+  expect(page).to have_css('#default_donation_type_form_row', visible: value)
+ end
+
