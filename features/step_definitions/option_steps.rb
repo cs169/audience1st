@@ -35,6 +35,7 @@
    expect(Option.send(opt.tr(' ','').underscore)).to eq(val)
  end
 
+ # Step defintions for testing the recurring donation feature
  When("I set {string} to {string}") do |setting_name, value|
   if value == 'Yes'
     value = true
