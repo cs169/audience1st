@@ -104,36 +104,37 @@ describe StoreController do
   describe 'quick donation with nonexistent customer' do
     before :each do
       @new_valid_customer = attributes_for(:customer).except(:password,:password_confirmation)
+      @new_account_code = create(:account_code, id: 6)
     end
     context 'when credit card token invalid' do
       before(:each) do
         allow(Stripe::Charge).to receive(:create).and_raise(Stripe::StripeError)
       end
       it 'redirects having created the customer' do
-        post :process_donation, {:customer => @new_valid_customer, :donation => 5, :credit_card_token => 'dummy'}
+        post :process_donation, {:customer => @new_valid_customer, :fund_code => @new_account_code.id, :donation => 5, :credit_card_token => 'dummy'}
         created_customer = Customer.find_by!(:email => @new_valid_customer[:email])
         expect(response).to redirect_to(quick_donate_path(:donation => 5, :customer_id => created_customer.id))
       end
       it 'shows error message' do
-        post :process_donation, {:customer => @new_valid_customer, :donation => 5, :credit_card_token => 'dummy'}
+        post :process_donation, {:customer => @new_valid_customer, :donation => 5, :fund_code => @new_account_code.id, :credit_card_token => 'dummy'}
         expect(flash[:alert]).to match(/credit card payment error/i)
       end
     end
     context 'with invalid donation amount' do
       it 'redirects having created the customer' do
-        post :process_donation, {:customer => @new_valid_customer, :credit_card_token => 'dummy'}
+        post :process_donation, {:customer => @new_valid_customer, :fund_code => @new_account_code.id, :credit_card_token => 'dummy'}
         created_customer = Customer.find_by!(:email => @new_valid_customer[:email])
         expect(response).to redirect_to(quick_donate_path(:donation => 0, :customer_id => created_customer.id))
       end
       it 'shows error message' do
-        post :process_donation, :customer => @new_valid_customer, :credit_card_token => 'dummy'
+        post :process_donation, :customer => @new_valid_customer, :fund_code => @new_account_code, :credit_card_token => 'dummy'
         expect(flash[:alert]).to match(/donation amount must be provided/i)
       end
     end
     context 'when new customer not valid as purchaser' do
       before(:each) do
         @invalid_customer = attributes_for(:customer).except(:city,:state)
-        @params = {:customer => @invalid_customer, :donation => 5, :credit_card_token => 'dummy'}
+        @params = {:customer => @invalid_customer, :fund_code => @new_account_code.id, :donation => 5, :credit_card_token => 'dummy'}
       end
       it 'does not create new customer' do
         expect { post :process_donation, @params }.not_to change { Customer.all.size }
