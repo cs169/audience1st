@@ -1,4 +1,4 @@
-Feature: make a recurring donation through regular sales flow
+Feature: make a recurring donation through quick donation
 
 Background:
   Given I am logged in as customer "Tom Foolery"
