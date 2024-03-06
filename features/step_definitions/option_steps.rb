@@ -75,5 +75,8 @@
  end
 
  When /I select monthly in the donation frequency radio button/ do 
-   
+  radio_button = page.find(:css, "#donation_frequency_radio")
+  radio_button.choose("Monthly")
+ end
+
 

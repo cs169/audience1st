@@ -5,7 +5,7 @@ Feature: make a recurring donation through regular sales flow
 Background:
   Given I am logged in as customer "Tom Foolery"
   Given admin has allowed recurring donations
-  And I go to the donation default page
+  And I go to the quick donation page
 
 Scenario: make donation
   Then I should see "frequency"
