@@ -102,43 +102,43 @@ describe StoreController do
   end
 
   describe '#process_donation: start a recurring donation' do
-  before :each do
-    @customer = create(:customer)
-  end
-  let (:monthly_donation_attempt) {
-    post :process_donation,
-    {:customer_id => @customer.id, :donation => 5, :donation_frequency => 'monthly', :credit_card_token => 'dummy', :comments => 'hello I am making a donation'}
-  }
-  context 'when donation completes successfully' do
     before :each do
-      allow(Stripe::Charge).to receive(:create).and_return(double("Stripe::Charge", id: 1))
+      @customer = create(:customer)
     end
-    it 'creates a new RecurringDonation record' do
-      expect{monthly_donation_attempt}.to change {RecurringDonation.count}.by(1)
+    let (:monthly_donation_attempt) {
+      post :process_donation,
+      {:customer_id => @customer.id, :donation => 5, :donation_frequency => 'monthly', :credit_card_token => 'dummy', :comments => 'hello I am making a donation'}
+    }
+    context 'when donation completes successfully' do
+      before :each do
+        allow(Stripe::Charge).to receive(:create).and_return(double("Stripe::Charge", id: 1))
+      end
+      it 'creates a new RecurringDonation record' do
+        expect{monthly_donation_attempt}.to change {RecurringDonation.count}.by(1)
+      end
+      it 'sets new RecurringDonation record attributes to correct values' do
+        monthly_donation_attempt
+        recurring_donation_record = RecurringDonation.find(1)
+        donation_record = Donation.find(1)
+        expect(recurring_donation_record.account_code_id).to(equal(donation_record.account_code_id))
+        expect(recurring_donation_record.customer_id).to(equal(donation_record.customer_id))
+        expect(recurring_donation_record.amount).to(equal(donation_record.amount))
+        expect(recurring_donation_record.comments).to(equal(donation_record.comments))
+      end
+      it 'adds a foreign key to the corresponding first donation instance' do
+        monthly_donation_attempt
+        expect(Donation.find(1).recurring_donation_id).to equal(RecurringDonation.find(1).id)
+      end
     end
-    it 'sets new RecurringDonation record attributes to correct values' do
-      monthly_donation_attempt
-      recurring_donation_record = RecurringDonation.find(1)
-      donation_record = Donation.find(1)
-      expect(recurring_donation_record.account_code_id).to(equal(donation_record.account_code_id))
-      expect(recurring_donation_record.customer_id).to(equal(donation_record.customer_id))
-      expect(recurring_donation_record.amount).to(equal(donation_record.amount))
-      expect(recurring_donation_record.comments).to(equal(donation_record.comments))
-    end
-    it 'adds a foreign key to the corresponding first donation instance' do
-      monthly_donation_attempt
-      expect(Donation.find(1).recurring_donation_id).to equal(RecurringDonation.find(1).id)
+    context 'when donation completes unsuccessfully' do
+      before :each do
+        allow(Stripe::Charge).to receive(:create).and_raise(Stripe::StripeError)
+      end
+      it 'does not create new RecurringDonation record if order fails to finalize' do
+        expect{monthly_donation_attempt}.to change {RecurringDonation.count}.by(0)
+      end
     end
   end
-  context 'when donation completes unsuccessfully' do
-    before :each do
-      allow(Stripe::Charge).to receive(:create).and_raise(Stripe::StripeError)
-    end
-    it 'does not create new RecurringDonation record if order fails to finalize' do
-      expect{monthly_donation_attempt}.to change {RecurringDonation.count}.by(0)
-    end
-  end
-end
 
   describe 'quick donation with nonexistent customer' do
     before :each do
