@@ -62,7 +62,7 @@
         .col-md-4.text-right
           %label.col-form-label Default Donation Type
           = option_description_for(:default_donation_type)
-        .col-md-8
+        .col-md-8{id:"donation_type_radio"}
           .radio-group.form-inline
             = f.radio_button :default_donation_type, 'one', :class => 'form-control', :id => 'one'
             = f.label :default_donation_type, 'One Time', :class => 'form-control', :for => 'one'

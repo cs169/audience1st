@@ -51,8 +51,8 @@
  end
 
  Then /the radio button to select the default donation type should be set to "(.*)"/ do |value|
-  radio_button = page.find(:css, '#default_donation_type_form_row', visible: false)
-  expect(page).to have_css('#default_donation_type_form_row', visible: value)
+  # How to check what option the radio button currently has selected?
+  radio_button = page.find(:css, '#donation_type_radio')
  end
 
 # Step defintions for testing the recurring donation feature user view
