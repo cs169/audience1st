@@ -35,7 +35,10 @@
    expect(Option.send(opt.tr(' ','').underscore)).to eq(val)
  end
 
+ #####
  # Step defintions for testing the recurring donation feature admin view
+ #####
+
  When /I set allow recurring donations to "(.*)"/ do |value|
   drop_down = page.find(:css, "#allow_recurring_donations_select")
   drop_down.select(value)
@@ -54,8 +57,11 @@
   # How to check what option the radio button currently has selected?
   radio_button = page.find(:css, '#donation_type_radio')
  end
-
+ 
+#####
 # Step defintions for testing the recurring donation feature user view
+#####
+
  Given /admin has allowed recurring donations/ do 
   Option.first.update_attributes!(:allow_recurring_donations => true)
  end
