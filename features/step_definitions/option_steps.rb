@@ -36,22 +36,9 @@
  end
 
  # Step defintions for testing the recurring donation feature admin view
- When /I set "(.*)" to "(.*)"/ do |setting_name, value|
-  if value == 'Yes'
-    value = true
-  elsif value == 'No'
-    value = false
-  end
-  # puts Option.find(1).read_attribute(:allow_recurring_donations)
-  # option = Option.find(1)
-  # option.update_attribute(setting_name.parameterize.underscore.to_sym, value)
-  Option.first.update_attributes!(setting_name.parameterize.underscore.to_sym => value)
-
-
-  # recurring_donation_select = page.find(:css, "#allow_recurring_donations_select")
-  # recurring_donation_select.click
-  # byebug
-  # puts recurring_donation_select.find(:xpath, 'Yes')
+ When /I set allow recurring donations to "(.*)"/ do |value|
+  drop_down = page.find(:css, "#allow_recurring_donations_select")
+  drop_down.select(value)
  end
 
  Then /the radio button to select the default donation type should be "(.*)"/ do |value|
@@ -60,13 +47,11 @@
   elsif value == 'hidden'
     value = false
   end
-  # puts Option.find(1).read_attribute(:allow_recurring_donations)
-  # radio = page.find(:css, "#default_donation_type_form_row", visible: false)
-  expect(page).to have_selector('#default_donation_type_form_row', visible: true)
+  expect(page).to have_selector('#default_donation_type_form_row', visible: value)
  end
 
  Then /the radio button to select the default donation type should be set to "(.*)"/ do |value|
-  # puts page.find(:css, '#default_donation_type_form_row')
+  radio_button = page.find(:css, '#default_donation_type_form_row', visible: false)
   expect(page).to have_css('#default_donation_type_form_row', visible: value)
  end
 
