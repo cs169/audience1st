@@ -36,7 +36,7 @@
  end
 
  # Step defintions for testing the recurring donation feature
- When("I set {string} to {string}") do |setting_name, value|
+ When /I set "(.*)" to "(.*)"/ do |setting_name, value|
   if value == 'Yes'
     value = true
   elsif value == 'No'
@@ -46,7 +46,7 @@
   option.update_attribute(setting_name.parameterize.underscore.to_sym, value)
  end
 
- Then("the radio button to select the default donation type should be {string}") do |value|
+ Then /the radio button to select the default donation type should be "(.*)"/ do |value|
   expect(page).to have_css('#default_donation_type_form_row', visible: value)
  end
 
