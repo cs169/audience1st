@@ -70,3 +70,10 @@
   expect(page).to have_css('#default_donation_type_form_row', visible: value)
  end
 
+ Given /admin has allowed recurring donations/ do 
+  Option.first.update_attributes!(:allow_recurring_donations => true)
+ end
+
+ When /I select monthly in the donation frequency radio button/ do 
+   
+
