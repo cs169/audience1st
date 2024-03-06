@@ -35,7 +35,7 @@
    expect(Option.send(opt.tr(' ','').underscore)).to eq(val)
  end
 
- # Step defintions for testing the recurring donation feature
+ # Step defintions for testing the recurring donation feature admin view
  When /I set "(.*)" to "(.*)"/ do |setting_name, value|
   if value == 'Yes'
     value = true
@@ -70,6 +70,7 @@
   expect(page).to have_css('#default_donation_type_form_row', visible: value)
  end
 
+# Step defintions for testing the recurring donation feature user view
  Given /admin has allowed recurring donations/ do 
   Option.first.update_attributes!(:allow_recurring_donations => true)
  end
@@ -77,6 +78,13 @@
  When /I select monthly in the donation frequency radio button/ do 
   radio_button = page.find(:css, "#donation_frequency_radio")
   radio_button.choose("Monthly")
+ end
+
+ Then /there should be a Recurring Donation model instance belonging to Tom Foolery/ do
+  r = RecurringDonation.first
+  c = Customer.find(r.customer_id)
+  expect(c.first_name).to eq("Tom")
+  expect(c.last_name).to eq("Foolery")
  end
 
 
