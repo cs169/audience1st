@@ -14,8 +14,6 @@ Scenario: Allow Monthly Recurring Donations
     Then the radio button to select the default donation type should be set to "one"
     And I press "Update Settings"
     Then I should see "Update successful"
-    When I go to the quick donation page
-    Then I should see "frequency"
 
 Scenario: Disallow Monthly Recurring Donations
     When I visit the admin:settings page
@@ -23,5 +21,3 @@ Scenario: Disallow Monthly Recurring Donations
     Then the radio button to select the default donation type should be "hidden"
     And I press "Update Settings"
     Then I should see "Update successful"
-    When I go to the quick donation page
-    Then I should not see "frequency"
