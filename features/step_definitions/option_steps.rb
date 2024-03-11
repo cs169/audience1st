@@ -62,6 +62,10 @@
 # Step defintions for testing the recurring donation feature user view
 #####
 
+Given /admin has not allowed recurring donations/ do 
+  Option.first.update_attributes!(:allow_recurring_donations => false)
+ end
+
  Given /admin has allowed recurring donations/ do 
   Option.first.update_attributes!(:allow_recurring_donations => true)
  end
@@ -71,11 +75,11 @@
   radio_button.choose("Monthly")
  end
 
- Then /there should be a Recurring Donation model instance belonging to Tom Foolery/ do
+ Then /there should be a Recurring Donation model instance belonging to "(.*) (.*)"$/ do |first,last|
   r = RecurringDonation.first
   c = Customer.find(r.customer_id)
-  expect(c.first_name).to eq("Tom")
-  expect(c.last_name).to eq("Foolery")
+  expect(c.first_name).to eq(first)
+  expect(c.last_name).to eq(last)
  end
 
 

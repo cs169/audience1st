@@ -12,5 +12,4 @@ Scenario: make donation
   When I fill in "Donation amount" with "15"
   And I press "Charge Donation to Credit Card"
   Then I should see "You have paid a total of $15.00 by Credit card"
-  Then there should be a Recurring Donation model instance belonging to Tom Foolery
-
+  Then there should be a Recurring Donation model instance belonging to "Tom Foolery"
