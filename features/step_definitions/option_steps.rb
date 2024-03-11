@@ -62,12 +62,21 @@
 # Step defintions for testing the recurring donation feature user view
 #####
 
-Given /admin has not allowed recurring donations/ do 
-  Option.first.update_attributes!(:allow_recurring_donations => false)
- end
+# Given /admin has not allowed recurring donations/ do 
+#   Option.first.update_attributes!(:allow_recurring_donations => false)
+#  end
 
- Given /admin has allowed recurring donations/ do 
-  Option.first.update_attributes!(:allow_recurring_donations => true)
+#  Given /admin has allowed recurring donations/ do 
+#   Option.first.update_attributes!(:allow_recurring_donations => true)
+#  end
+
+ Given /admin "(.*)" allowed recurring donations/ do |value|
+  if value == 'has'
+    value = true
+  elsif value == 'has not'
+    value = false
+  end
+  Option.first.update_attributes!(:allow_recurring_donations => value)
  end
 
  When /I select monthly in the donation frequency radio button/ do 

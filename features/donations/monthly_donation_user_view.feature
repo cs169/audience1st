@@ -2,7 +2,7 @@ Feature: make a recurring donation through quick donation
 
 Background:
   Given I am logged in as customer "Tom Foolery"
-  Given admin has allowed recurring donations
+  Given admin "has" allowed recurring donations
   And I go to the quick donation page
 
 @stubs_successful_credit_card_payment
@@ -13,3 +13,4 @@ Scenario: make donation
   And I press "Charge Donation to Credit Card"
   Then I should see "You have paid a total of $15.00 by Credit card"
   Then there should be a Recurring Donation model instance belonging to "Tom Foolery"
+ 
