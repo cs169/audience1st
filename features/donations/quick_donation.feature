@@ -96,7 +96,7 @@ Scenario: admin logged in, records donation on behalf of patron
   Then I should see "Thank You for Your Purchase!"
   And customer "Joe Mallon" should have a donation of $9.00 to "General Fund"
   And an email should be sent to customer "Joe Mallon" containing "$  9.00  Donation to General Fund"
-  
+
 Scenario: landing on quick donation page with valid account code
   Given I am logged in as customer "Tom Foolery"
   When I visit the quick donation landing page for account code 0504
@@ -113,14 +113,28 @@ Scenario: landing on quick donation page with no account code
   Given I am logged in as customer "Tom Foolery"
   When I go to the quick donation page
   Then I should not see "Donate to"
-  Then I should see "General Fund"
-  Then I should see "General Fund Address"
+  And I should see "General Fund"
+  And I should see "General Fund Address"
   
 Scenario: landing on quick donation page with valid account code and making quick donation
   Given I am logged in as customer "Tom Foolery"
   When I go to the quick donation page
-  When I fill in "Donation amount" with "15"
+  And I fill in "Donation amount" with "15"
   And I press "Charge Donation to Credit Card"
   Then I should see "You have paid a total of $15.00 by Credit card"
   And customer "Tom Foolery" should have a donation of $15.00 to "Soda Fund"
+  
+
+Scenario: customer not logged in, logs in for a quicker checkout
+
+  Given customer "Tom Foolery" has email "tom@foolery.com" and password "pass"
+  And I am not logged in
+  When I go to the quick donation page
+  And I fill in "email" with "tom@foolery.com"
+  And I fill in "password" with "pass"
+  And I press "Login"
+  When I fill in "Donation amount" with "15"
+  And I press "Charge Donation to Credit Card"
+  Then I should see "You have paid a total of $15.00 by Credit card"
+  And customer "Tom Foolery" should have a donation of $15.00 to "General Fund"
   
