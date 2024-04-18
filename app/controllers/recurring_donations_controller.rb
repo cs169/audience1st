@@ -14,11 +14,15 @@ class RecurringDonationsController < ApplicationController
   def index
     @total = 0
     @params = {}
-    @page_title = "Donation history"
+    @page_title = "Recurring donation history"
     @page = (params[:page] || '1').to_i
     @header = ''
     @donations = Donation.
       includes(:order,:customer,:account_code).
+      where.not(:customer_id => Customer.walkup_customer.id).
+      order(:sold_on)
+    @recurringDonations = RecurringDonation.
+      includes(:order, :customer, :account_code).
       where.not(:customer_id => Customer.walkup_customer.id).
       order(:sold_on)
     if (params[:use_cid] && !params[:cid].blank?)  # cust id will be embedded in route in autocomplete field
@@ -53,7 +57,6 @@ class RecurringDonationsController < ApplicationController
     end
     @total = @donations.sum(:amount)
     @params = params
-
     if params[:commit] =~ /download/i
       send_data @donations.to_csv,  :type => 'text/csv', :filename => 'donations_report.csv'
     else
@@ -61,65 +64,6 @@ class RecurringDonationsController < ApplicationController
       @header << "#{@donations.total_entries} transactions, " <<
         ActionController::Base.helpers.number_to_currency(@total)
     end
-  end
-
-  def new
-    @donation ||= @customer.donations.new(:amount => 0,:comments => '')
-  end
-
-  def create
-    @order = Order.create(:purchaser => @customer, :customer => @customer, :processed_by => current_user)
-    @donation = Donation.from_amount_and_account_code_id(
-      params[:amount].to_f, params[:fund].to_i, params[:comments].to_s)
-    @order.add_donation(@donation)
-    @order.processed_by = current_user()
-
-    sold_on = Date.from_year_month_day(params[:date])
-    case params[:payment]
-    when 'check'
-      @order.purchasemethod = Purchasemethod.get_type_by_name('box_chk')
-    when 'cash'
-      @order.purchasemethod = Purchasemethod.get_type_by_name('box_cash')
-    when 'credit_card'
-      @order.purchasemethod = Purchasemethod.get_type_by_name('web_cc')
-      @order.purchase_args =  { :credit_card_token => params[:credit_card_token] }
-      sold_on = Time.current
-    end
-    @order.comments = params[:comments].to_s
-    unless @order.ready_for_purchase?
-      flash[:alert] = @order.errors.as_html
-      render :action => 'new'
-      return
-    end
-    begin
-      @order.finalize!(sold_on)
-      redirect_to(customer_path(@customer), :notice => 'Donation recorded.')
-    rescue Order::PaymentFailedError => e
-      @order.destroy
-      redirect_to(new_customer_donation_path(@customer), :alert => e.message)
-    rescue StandardError => e
-      @order.destroy
-      # rescue ActiveRecord::RecordInvalid => e
-      # rescue Order::OrderFinalizeError => e
-      # rescue RuntimeError => e
-    end
-  end
-
-  def update
-    if (t = Donation.find_by_id(params[:id])).kind_of?(Donation)
-      now = Time.current
-      c = current_user.email rescue "(??)"
-      t.update_attributes(:letter_sent => now,
-        :processed_by => current_user)
-      Txn.add_audit_record(:customer_id => t.customer_id,
-        :logged_in_id => current_user.id,
-        :txn_type => 'don_ack',
-        :comments => "Donation ID #{t.id} marked as acknowledged")
-      result = now.strftime("%D by #{c}")
-    else
-      result = '(ERROR)'
-    end
-    render :js => %Q{\$('#donation_#{params[:id]}').text('#{result}')}
   end
 
   # AJAX handler for updating the text of a donation's comment
