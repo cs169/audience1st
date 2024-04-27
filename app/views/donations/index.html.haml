@@ -1,5 +1,7 @@
 %h1= @header
 
+= link_to 'Recurring Donations', recurring_donations_path, class: 'btn btn-primary', style: 'float: right; margin-top: 10px;'
+
 .pagination-container
   .pagination.mx-auto
     = will_paginate @donations, :previous_label => '&laquo;', :next_label => '&raquo;', :container => false
