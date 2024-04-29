@@ -51,6 +51,12 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :recurring_donations, :only  => [:index, :update] do
+      member do
+        post :update_comment_for
+      end
+    end
+
     # RSS
 
     get '/ics/showdates.ics'          => 'info#showdates'
