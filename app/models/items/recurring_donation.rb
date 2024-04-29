@@ -19,4 +19,11 @@ class RecurringDonation < Item
     donation = Donation.find_by(recurring_donation_id: id)
     donation ? donation.item_description : nil # Returns the donation item description if found, otherwise returns nil
   end
+  def first_donation
+    # Retrieves the earliest donation based on the created_at timestamp
+    Donation.where(recurring_donation_id: id).order(sold_on: :asc).first
+  end
+  def start_date
+    first_donation.sold_on
+  end
 end

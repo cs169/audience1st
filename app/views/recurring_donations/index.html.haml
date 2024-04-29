@@ -17,7 +17,7 @@
       %tr{:id => "donation_row_#{t.id}"}
       %td= link_to t.customer.full_name, recurring_donations_path(:use_cid => 1, :cid => t.customer, :show_vouchers => true, :commit => 'Go')
       %td= link_to_order_containing t
-      %td= t.sold_on.strftime '%D'
+      %td= t.start_date.strftime '%D'
       %td.right= number_to_currency(t.monthly_amount)
       %td= number_to_currency(t.total_to_date)
       %td= "todo"
