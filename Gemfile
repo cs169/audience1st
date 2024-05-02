@@ -56,7 +56,7 @@ group :test do
   gem 'fake_stripe'
   gem 'webdrivers','>= 5.2.0', require: false
   gem 'rspec-json_expectations'
-  gem 'simplecov'
+  gem 'simplecov', '0.17.1'
   gem 'timecop'
   gem 'webmock'
   gem 'vcr'
